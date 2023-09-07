@@ -1,31 +1,32 @@
+
 # netneuro-R
 
-**Prerequisites** These tutorials will use RStudio. You'll need to install it along with R, see [here](https://posit.co/download/rstudio-desktop/) for instructions.
+## Prerequisites
+These tutorials utilize RStudio. Ensure that you've installed both R and RStudio. For installation instructions, refer [here](https://posit.co/download/rstudio-desktop/).
 
-## Getting the Files Data in this Package
-* **Option 1** The easiest way is to use the git and the command line to checkout this repository
- 
+## Obtaining the Files in this Package
+* **Option 1:** The simplest method is to use git along with the command line to clone this repository:
+
    ```git clone https://github.com/UO-Data-Science/netneuro-R.git```
-  
-* **Option 2** Download the data and R markdown files from github
-  * Step 1: Click on the file you would like to download in github, which should open a preview of it
-  * Step 2: In bar above the file preview there is a download button that will let you save the files wherever you want on your computer
+ 
+* **Option 2:** Download the data and R markdown files from GitHub:
+  1. Click on the file you wish to download in GitHub. This action should open a preview of the file.
+  2. Above the file preview, there's a download button which allows you to save the files to your preferred location on your computer.
 
 ## Running Examples
-* Each of the examples below has an RMarkdown file and potentially some data files. See more information [here](https://rmarkdown.rstudio.com/lesson-1.html)
-* RMarkdown creates html, pdfs, or others file types by 'kniting' your code into html or pdfs
-* To knit each example look for the knit button in RStudio and press it
-<img src=https://raw.githubusercontent.com/UO-Data-Science/netneuro-R/main/assets/knit_button.png/>
+* Each example provided below includes an RMarkdown file, and some may have accompanying data files. For more details on RMarkdown, click [here](https://rmarkdown.rstudio.com/lesson-1.html).
+* RMarkdown can generate HTML, PDFs, or other file types by 'knitting' your code into either HTML or PDF formats.
+* To knit each example, search for the "knit" button in RStudio and click it. 
+![knit button](https://raw.githubusercontent.com/UO-Data-Science/netneuro-R/main/assets/knit_button.png)
 
-### Trouble Shooting
-* All RMarkdown files are intended to run with the working directory set to the same folder as the markdown file. You can do this by clicking the **To Source File Location** button
-<img src=https://raw.githubusercontent.com/UO-Data-Science/netneuro-R/main/assets/setwd.png />
+### Troubleshooting
+* Ensure all RMarkdown files run with the working directory set to the same folder as the markdown file. To achieve this, click on the **To Source File Location** button:
+![set working directory](https://raw.githubusercontent.com/UO-Data-Science/netneuro-R/main/assets/setwd.png)
 
-# Examples
+## Examples
 
-# Getting Started
-Some basics of R can be found [here](https://github.com/UO-Data-Science/netneuro-R/tree/main/Intro)
+### Getting Started
+Discover some basics of R [here](https://github.com/UO-Data-Science/netneuro-R/tree/main/Intro).
 
-
-# Classification Problem
-Create an algorithm to tell good wine from bad [here](https://github.com/UO-Data-Science/netneuro-R/tree/main/Classification).
+### Classification Problem
+Develop an algorithm to distinguish good wine from bad [here](https://github.com/UO-Data-Science/netneuro-R/tree/main/Classification).
