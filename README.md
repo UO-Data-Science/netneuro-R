@@ -1,4 +1,3 @@
-
 # netneuro-R
 
 ## Prerequisites
@@ -25,8 +24,14 @@ These tutorials utilize RStudio. Ensure that you've installed both R and RStudio
 
 ## Examples
 
+All exercises live in there own folder with an Rmarkdown file. The RMarkdown file has a number of places for you to write your own code, try to fill these out and get start working in R!
+
 ### Getting Started
-Discover some basics of R [here](https://github.com/UO-Data-Science/netneuro-R/tree/main/Intro).
+Discover some basics of R 
+* [File Folder](https://github.com/UO-Data-Science/netneuro-R/tree/main/Intro).
+* [Output Example](https://github.com/UO-Data-Science/netneuro-R/tree/main/Intro/IntroR.md).
 
 ### Classification Problem
-Develop an algorithm to distinguish good wine from bad [here](https://github.com/UO-Data-Science/netneuro-R/tree/main/Classification).
+Develop an algorithm to distinguish good wine from bad. 
+* [File Folder](https://github.com/UO-Data-Science/netneuro-R/tree/main/Classification).
+* [Output Example](https://github.com/UO-Data-Science/netneuro-R/tree/main/Classification/Classification.md).
