@@ -2,7 +2,7 @@
 title: "Classification"
 author: "Jake Searcy"
 date: "2023-09-05"
-output: html_document
+output: github_document
 ---
 
 ```{r setup}
