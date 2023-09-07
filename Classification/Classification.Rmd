@@ -1,0 +1,235 @@
+---
+title: "Classification"
+author: "Jake Searcy"
+date: "2023-09-05"
+output: html_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+library('randomForest')
+download.file("https://archive.ics.uci.edu/static/public/186/wine+quality.zip",'wine_data.zip')
+unzip('wine_data.zip')
+```
+
+# Classification Algorithms
+
+All machine learning is trying to approximate a function that maps some inputs to outputs.
+
+
+Classification is a type of Machine Learning algorithm that aims to predict the class something belongs to from a set of features. Inputs vary, but the output is the probability that an example belongs to a class.
+
+Examples
+* From pixels in an image, predict whether it's a dog or a cat
+* From social media text, determine if a statement is positive or negative. 
+* From measurements of an animal, determine its species
+
+
+Two main categories
+* Binary classification - You have only two classes Positive/Negative, True/False, Cat/Dog
+  * Target values are a 0 or a 1
+  * Target values can be string label Dog/Cat
+  
+* Multiclass Classification - You have several classes Cat/Dog/Bird, 0/1/2/3/4/5/6... 
+  * Target values can be expressed in several ways
+      * A string with a class's label
+      * A number labeling the class
+      * A one-hot encoded vector which is a vector with length equal to the number of classes with precisely one entry labeled as a one and the rest zero.
+          * i.e., For three classes
+          * The first class is represented as  [1,0,0]
+          * The first class is represented as  [0,1,0]
+          * The first class is represented as  [0,0,1]
+
+
+# Create a Wine-dataset
+read in data from two csvs, and combine them in R (we could do the same in bash).
+* Generally for ML Datasets we want
+  * Clear data splits - (at a minnium a training datset and a testing dataset)
+  * No missing values
+  * At least one clear target
+  
+
+```{r get_data}
+red<-read.csv('winequality-red.csv',header=TRUE,sep=';')
+white<-read.csv('winequality-white.csv',header=TRUE,sep=';')
+#Let's combine both datasets and add a column to distingush red vs white
+red$isred <-1
+white$isred <-0
+
+head(red)
+
+all=merge(red,white,all=TRUE)
+#Check for missing values
+is.null(all)
+
+```
+## Split the data into 80% train and 20% test
+use the sample command to randomly select indices
+```{r split_data}
+# Randomly Select training indices
+train_index <- sample(seq_len(nrow(all)),size= nrow(all)*.8, replace=FALSE )
+
+
+#Split the data
+wine_train <- all[train_index,]
+wine_test <- all[-train_index,]
+```
+
+
+
+# Classification Algorithms
+
+There are several kinds of classification algorithms
+* Logistic Regression 
+* Support Vector Machine
+* Random Forest
+* Deep Neural Networks
+* Lots more
+
+It's common to try several to see which one works best; however, a few things to think about
+* Not all algorithms do multi-class classification
+* Some algorithms are computationally expensive
+* Some work better on bigger datasets
+* We are working with structured data, but generally, different kinds of data will need different kinds of algorithms
+You'll have to try and balance the tradeoffs for your problem.
+
+Today we will start with Random Forests which can be used with both binary and multi-class classification. **For now, just think of it as a kind of program that learns from examples**
+
+## There are some differences in how algorithms work in the two classification cases
+
+* Outputs for binary classification is just a single number between 0-1 that it belongs to the first class (or which every class is labeled by a 1/True). The probability it belongs to a second class is just one minus the probability of the first class.
+
+* Outputs for multi-class classification is one number **per** class with the probability that the example belongs to that class **the sum of all these numbers must equal one**
+
+* It's true that binary classification is a subset of multi-class classification (with just two classes), but it is common you'll see the distinction
+
+## Probability to Predictions
+Classification models often output probability, but if you want to calculate things like accuracy, you need to guess the true class:
+* Binary classification if probability > 0.5 True otherwise False
+* Multi-class classification prediction has the greatest probability
+**You don't have to follow these rules** - you can use your own thresholds if you want to be more confident in your predictions
+
+
+# Random Forests
+
+```{r}
+?randomForest
+```
+
+
+Lots of options, but the simplest usage is just giving this function an x and a y.
+
+```{r }
+# Let's get our x's and y's 
+# In this case lets try to predict if a wine is red or white
+
+
+x<-subset(wine_train, select=-isred)
+y<-as.factor(wine_train$isred)
+
+xtest<-subset(wine_test, select=-isred)
+ytest<-as.factor(wine_test$isred)
+```
+
+Now you can fit your data in one line.
+```{r}
+rf=randomForest(x,y,xtest,ytest,ntree=100,importance=TRUE,keep.forest=TRUE)
+rf
+```
+
+# Predictions
+
+```{r}
+#Predict Classes Red or White
+outputs=predict(rf,xtest,type='response')
+head(outputs)
+
+#Predict Probabilities Red or White
+cont_outputs=predict(rf,xtest,type='prob')
+head(cont_outputs)
+```
+
+Check the quality of predictions with a histogram
+
+If everything worked well, the red wines should have probabilities near one and whites near zero
+
+```{r}
+options(repr.plot.width=20,repr.plot.height=10)
+ax<-pretty(0:1,n=50)
+hRed<-hist(cont_outputs[ytest==1,2],plot=FALSE,breaks=ax)
+hWhite<-hist(cont_outputs[ytest==0,2],plot=FALSE,breaks=ax)
+
+c1=rgb(1,.1,.2,alpha=.80)
+c2=rgb(1,1.,.2,alpha=.80)
+
+plot(hWhite,col=c2,xlab='P(Red|X)')
+plot(hRed, col=c1,add=TRUE)
+legend(.8,600,legend=c('Whites','Reds'),fill=c(c2,c1))
+```
+
+```{r}
+#List Red wines with the highest probability of being white wines
+index<-sort(cont_outputs[ytest==1,1],decreasing=TRUE)
+index[1:10]
+# Let's look at the most 'white-like' red
+all[583,]
+```
+# Importance
+
+A good next question is what why there are some outliers and how the model is deciding between what is a red wine and what is a white wine.
+
+    This is another thing to think about when selecting a model, how easy is it to get out meaningful information about how it's making decisions
+
+    Random forests often use Mean Decrease in Accuracy - which means how much worse in the classifier when a variable is not included. If the classifier is bad after removing a variable, it is considered important.
+
+```{r}
+importance(rf)
+```
+
+# Question
+
+Is a higher total sulfur dioxide more or less likely in red wine? 
+
+```{r}
+ax<-pretty(0:500,n=100)
+
+hRed<-hist(red$'total.sulfur.dioxide',plot=FALSE,breaks=ax)
+hWhite<-hist(white$'total.sulfur.dioxide',plot=FALSE,breaks=ax)
+
+c1=rgb(1,.1,.2,alpha=.80)
+c2=rgb(1,1.,.2,alpha=.80)
+
+plot(hWhite,col=c2)
+plot(hRed, col=c1,add=TRUE)
+
+```
+
+#Exercise
+
+We had one red wine classify as exceptionally white-like. From the importance values and histogram plots you make. Can you find out why one of the red wines was classified very likely as a white wine?
+
+```{r}
+"Your Code"
+```
+
+Now Train your own random forest and see if you can determine what the most important factors influencing wine quality are?
+
+```{r}
+"Your Code"
+```
+
+
+# How much data do you need?
+
+This is a trick question - lets see when we train with different dataset sizes
+```{r}
+nd=500
+y_data <- c()
+x_axis=seq(from=10,to=nrow(x),by=100)
+for (nd in x_axis){
+    rf=randomForest(x[1:nd,],y[1:nd],xtest,ytest,ntree=500,importance=TRUE)
+    y_data<-append(y_data,rf$test$err.rate[500,1])
+}
+plot(x_axis,y_data,log='yx',xlab='# of Examples',ylab="Error Rate")
+
+```
